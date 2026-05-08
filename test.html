@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Վերջին Զանգ</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Montserrat:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    background:#05070c;
+    overflow-x:hidden;
+    font-family:'Montserrat',sans-serif;
+    color:white;
+}
+
+.bg{
+    position:fixed;
+    inset:0;
+    background:
+    linear-gradient(rgba(0,0,0,.72),rgba(0,0,0,.88)),
+    url('https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?q=80&w=1600&auto=format&fit=crop');
+    background-size:cover;
+    background-position:center;
+    z-index:-5;
+}
+
+/* PARTICLES */
+
+.particles span{
+    position:fixed;
+    width:6px;
+    height:6px;
+    background:#d6b36a;
+    border-radius:50%;
+    animation:float 12s linear infinite;
+    opacity:.7;
+    z-index:-1;
+}
+
+.particles span:nth-child(1){left:10%;animation-duration:8s;}
+.particles span:nth-child(2){left:20%;animation-duration:12s;}
+.particles span:nth-child(3){left:35%;animation-duration:9s;}
+.particles span:nth-child(4){left:50%;animation-duration:15s;}
+.particles span:nth-child(5){left:70%;animation-duration:10s;}
+.particles span:nth-child(6){left:85%;animation-duration:13s;}
+.particles span:nth-child(7){left:93%;animation-duration:7s;}
+
+@keyframes float{
+    0%{
+        transform:translateY(100vh) scale(0);
+    }
+    100%{
+        transform:translateY(-10vh) scale(1.5);
+    }
+}
+
+/* START SCREEN */
+
+.start-screen{
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+    position:relative;
+}
+
+/* GATE */
+
+.gate-wrapper{
+    position:relative;
+    width:750px;
+    height:450px;
+    perspective:2000px;
+}
+
+.gate{
+    position:absolute;
+    width:50%;
+    height:100%;
+    top:0;
+    background:linear-gradient(to bottom,#1a1d25,#0d1016);
+    border:4px solid #cda45f;
+    box-shadow:0 0 25px rgba(0,0,0,.6);
+    transition:2.5s ease;
+    overflow:hidden;
+}
+
+.gate::before{
+    content:'';
+    position:absolute;
+    inset:15px;
+    border:2px solid rgba(214,179,106,.5);
+}
+
+.gate::after{
+    content:'';
+    position:absolute;
+    top:0;
+    left:50%;
+    width:3px;
+    height:100%;
+    background:rgba(214,179,106,.3);
+}
+
+.left-gate{
+    left:0;
+    transform-origin:left;
+    border-right:none;
+    border-radius:10px 0 0 10px;
+}
+
+.right-gate{
+    right:0;
+    transform-origin:right;
+    border-left:none;
+    border-radius:0 10px 10px 0;
+}
+
+.gate-wrapper.open .left-gate{
+    transform:rotateY(-110deg);
+}
+
+.gate-wrapper.open .right-gate{
+    transform:rotateY(110deg);
+}
+
+.gate-text{
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    color:#f0d089;
+    font-size:70px;
+    font-family:'Cormorant Garamond',serif;
+    letter-spacing:6px;
+}
+
+/* PAPER */
+
+.paper{
+    position:absolute;
+    width:500px;
+    min-height:300px;
+    background:#f4ead8;
+    color:#111;
+    left:50%;
+    top:55%;
+    transform:translate(-50%,-50%) scale(.5);
+    opacity:0;
+    border-radius:10px;
+    padding:45px;
+    text-align:center;
+    box-shadow:0 20px 50px rgba(0,0,0,.6);
+    transition:2s;
+}
+
+.paper::before{
+    content:'';
+    position:absolute;
+    inset:12px;
+    border:2px solid rgba(0,0,0,.15);
+}
+
+.gate-wrapper.open .paper{
+    opacity:1;
+    transform:translate(-50%,-50%) scale(1);
+}
+
+.paper h1{
+    font-size:65px;
+    font-family:'Cormorant Garamond',serif;
+    color:#1b1b1b;
+}
+
+.paper p{
+    margin-top:25px;
+    font-size:28px;
+    line-height:1.8;
+}
+
+.paper .date{
+    margin-top:25px;
+    font-size:38px;
+    color:#8f6832;
+    font-family:'Cormorant Garamond',serif;
+}
+
+/* BUTTON */
+
+.open-btn{
+    margin-top:35px;
+    width:85px;
+    height:85px;
+    border-radius:50%;
+    border:none;
+    background:#111;
+    color:#d8b56a;
+    font-size:30px;
+    cursor:pointer;
+    transition:.4s;
+    border:2px solid #d8b56a;
+}
+
+.open-btn:hover{
+    transform:scale(1.08);
+}
+
+/* MAIN SITE */
+
+.main-site{
+    opacity:0;
+    transform:translateY(-120px);
+    pointer-events:none;
+    transition:2s;
+    padding:50px 20px;
+}
+
+.main-site.show{
+    opacity:1;
+    transform:translateY(0);
+    pointer-events:auto;
+}
+
+/* HERO */
+
+.hero{
+    text-align:center;
+    margin-top:40px;
+}
+
+.hero h1{
+    font-size:120px;
+    color:#f0d089;
+    font-family:'Cormorant Garamond',serif;
+}
+
+.hero h2{
+    font-size:60px;
+    color:#f0d089;
+    font-family:'Cormorant Garamond',serif;
+}
+
+.hero p{
+    margin-top:10px;
+    color:#d7b26b;
+    font-size:34px;
+}
+
+/* TIMER */
+
+.timer{
+    margin-top:55px;
+    display:flex;
+    justify-content:center;
+    gap:25px;
+    flex-wrap:wrap;
+}
+
+.box{
+    width:150px;
+    height:150px;
+    border-radius:20px;
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(214,179,106,.4);
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    backdrop-filter:blur(6px);
+}
+
+.box h3{
+    font-size:55px;
+}
+
+.box span{
+    margin-top:10px;
+    color:#d6b36a;
+}
+
+/* GALLERY */
+
+.gallery-title{
+    margin-top:90px;
+    text-align:center;
+    font-size:65px;
+    color:#f0d089;
+    font-family:'Cormorant Garamond',serif;
+}
+
+.gallery{
+    margin-top:50px;
+    display:flex;
+    flex-direction:column;
+    gap:35px;
+}
+
+.gallery-card{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:25px;
+    align-items:center;
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(214,179,106,.25);
+    border-radius:30px;
+    overflow:hidden;
+    backdrop-filter:blur(8px);
+    min-height:350px;
+}
+
+.gallery-card img{
+    width:100%;
+    height:350px;
+    object-fit:cover;
+    display:block;
+}
+
+.gallery-text{
+    padding:40px;
+}
+
+.gallery-text h3{
+    font-size:55px;
+    color:#f0d089;
+    margin-bottom:20px;
+    font-family:'Cormorant Garamond',serif;
+}
+
+.gallery-text p{
+    color:#ddd;
+    line-height:2;
+    font-size:18px;
+}
+
+.reverse img{
+    order:2;
+}
+
+.reverse .gallery-text{
+    order:1;
+}
+
+@media(max-width:900px){
+
+.gallery-card{
+    grid-template-columns:1fr;
+}
+
+.gallery-card img{
+    height:280px;
+}
+
+.reverse img,
+.reverse .gallery-text{
+    order:unset;
+}
+
+.gallery-title{
+    font-size:45px;
+}
+
+.gallery-text h3{
+    font-size:38px;
+}
+
+}
+
+/* MUSIC */
+
+.music-btn{
+    position:fixed;
+    top:25px;
+    right:25px;
+    width:60px;
+    height:60px;
+    border-radius:50%;
+    border:1px solid rgba(214,179,106,.5);
+    background:#111;
+    color:#d6b36a;
+    font-size:24px;
+    cursor:pointer;
+    z-index:100;
+}
+
+audio{
+    display:none;
+}
+
+/* MOBILE */
+
+@media(max-width:850px){
+
+.gate-wrapper{
+    width:95%;
+    height:320px;
+}
+
+.paper{
+    width:90%;
+    padding:30px;
+}
+
+.paper h1{
+    font-size:45px;
+}
+
+.paper p{
+    font-size:20px;
+}
+
+.paper .date{
+    font-size:28px;
+}
+
+.hero h1{
+    font-size:70px;
+}
+
+.hero h2{
+    font-size:40px;
+}
+
+.hero p{
+    font-size:24px;
+}
+
+.box{
+    width:120px;
+    height:120px;
+}
+
+}
+
+</style>
+</head>
+<body>
+
+<div class="bg"></div>
+
+<div class="particles">
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span
+    <span></span>
+</div>
+
+<audio id="music" loop>
+    <source src="https://files.catbox.moe/u3pfku.mp3" type="audio/mpeg">
+</audio>
+
+<button class="music-btn" id="musicBtn">♫</button>
+
+<!-- START SCREEN -->
+
+<section class="start-screen">
+
+    <div class="gate-wrapper" id="gateWrapper">
+
+        <div class="gate left-gate">
+            <div class="gate-text">9Ա,Բ,Գ</div>
+        </div>
+
+        <div class="gate right-gate">
+            <div class="gate-text">2026</div>
+        </div>
+
+        <div class="paper">
+
+            <h1>9Ա,Բ,Գ</h1>
+
+            <p>
+                Մենք ձեզ հրավիրում ենք<br>
+                մեր վերջին զանգին👇👇👇
+            </p>
+
+            <div class="date">
+                22.05.2026թ.
+            </div>
+
+        </div>
+
+    </div>
+
+    <button class="open-btn" id="openBtn">
+        ✦
+    </button>
+
+</section>
+
+<!-- MAIN SITE -->
+
+<section class="main-site" id="mainSite">
+
+    <div class="hero">
+
+        <h1>9Ա</h1>
+
+        <h2>Վերջին զանգ</h2>
+
+        <p>22 Մայիս 2026</p>
+
+    </div>
+
+    <!-- TIMER -->
+
+    <div class="timer">
+
+        <div class="box">
+            <h3 id="days">0</h3>
+            <span>Օր</span>
+        </div>
+
+        <div class="box">
+            <h3 id="hours">0</h3>
+            <span>Ժամ</span>
+        </div>
+
+        <div class="box">
+            <h3 id="minutes">0</h3>
+            <span>Րոպե</span>
+        </div>
+
+        <div class="box">
+            <h3 id="seconds">0</h3>
+            <span>Վայրկյան</span>
+        </div>
+
+    </div>
+
+<!-- CLASS PHOTOS -->
+
+<div class="gallery-title">
+    Մեր հիշողությունները
+</div>
+
+<div class="gallery">
+
+    <div class="gallery-card">
+
+        <img src="https://lh3.googleusercontent.com/gps-cs-s/APNQkAEGQOD32SjHEFNI7RLd3psz9J8f5_HL3kCVXpVGKyhEr4bwYDpXb7gnMRgEccqI6beM0MkB_inylji-h-AsxmAA6U-a76GwoGOzk1aHx98TXsEcZUBYXASboPgp1XMs7iL5IRuCaQ=s680-w680-h510-rw">
+
+        <div class="gallery-text">
+
+            <h3>Մեր դպրոցը</h3>
+
+            <p>
+                Այս դպրոցում անցան մեր կյանքի ամենագեղեցիկ տարիները։
+                Այստեղ մենք սովորեցինք ընկերություն անել,
+                հաղթահարել դժվարությունները և հավատալ մեր երազանքներին։
+            </p>
+
+        </div>
+
+    </div>
+
+    <div class="gallery-card reverse">
+
+        <img src="c:\Users\armen\OneDrive\Desktop\hraviratoms\photo_2026-05-08_21-37-14.jpg">
+
+        <div class="gallery-text">
+
+            <h3>Մեր դասարանը</h3>
+
+            <p>
+                Մեր դասարանը պարզապես դասարան չէ։
+                Սա մի մեծ ընտանիք է,
+                որտեղ յուրաքանչյուր օրը լցված էր
+                ծիծաղով, հիշողություններով և ջերմությամբ։
+            </p>
+
+        </div>
+
+    </div>
+
+    <div class="gallery-card">
+
+        <img src="c:\Users\armen\OneDrive\Desktop\hraviratoms\photo_2026-05-08_21-47-19.jpg"> 
+
+        <div class="gallery-text">
+
+            <h3>Մեր Դասղեկը</h3>
+
+            <p>
+
+Սիրելի՛ դասղեկ,Շնորհակալ ենք Ձեր անսահման հոգատարության, ջերմության և մեզ միշտ ճիշտ ուղի ցույց տալու համար։
+Դուք մեզ համար դարձաք ոչ միայն ուսուցիչ, այլ նաև հարազատ մարդ, ում խոսքերը և խորհուրդները միշտ կմնան մեր սրտերում։
+Մեր դպրոցական ամենագեղեցիկ հիշողությունների մեծ մասը կապված է հենց Ձեզ հետ։
+
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+    </section>
+
+<script>
+
+const gateWrapper = document.getElementById('gateWrapper');
+const openBtn = document.getElementById('openBtn');
+const mainSite = document.getElementById('mainSite');
+const music = document.getElementById('music');
+const musicBtn = document.getElementById('musicBtn');
+
+openBtn.addEventListener('click',()=>{
+
+    gateWrapper.classList.add('open');
+
+    music.play();
+
+    setTimeout(()=>{
+        mainSite.classList.add('show');
+    },4000);
+
+});
+
+musicBtn.addEventListener('click',()=>{
+
+    if(music.paused){
+        music.play();
+    }else{
+        music.pause();
+    }
+
+});
+
+const targetDate = new Date("May 22, 2026 00:00:00").getTime();
+
+setInterval(()=>{
+
+    const now = new Date().getTime();
+
+    const distance = targetDate - now;
+
+    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+    document.getElementById('days').innerHTML = days;
+    document.getElementById('hours').innerHTML = hours;
+    document.getElementById('minutes').innerHTML = minutes;
+    document.getElementById('seconds').innerHTML = seconds;
+
+},1000);
+
+</script>
+
+</body>
+</html>
