@@ -86,6 +86,7 @@
             height: 55vw;
             max-height: 360px;
             perspective: 1000px;
+            /* ВАЖНО: убрал overflow: hidden, чтобы письмо могло выйти полностью */
         }
 
         .envelope {
@@ -95,7 +96,7 @@
             background: #efe5d5;
             border-radius: 4px;
             box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
+            /* overflow: hidden; - УБРАНО */
         }
 
         .flap {
@@ -170,24 +171,43 @@
             background: #0d0f12; /* Почти черный фон */
             left: 7%;
             bottom: 10%;
+            /* Исходное положение: спрятано внизу */
             transform: translateY(120%);
             border-radius: 12px;
             border: 1px solid rgba(214, 179, 106, 0.4);
-            transition: transform 2.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+            transition: transform 1.8s cubic-bezier(0.2, 0.8, 0.2, 1);
             z-index: 2;
-            padding: 20px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
+        /* Состояние 1: Крышка открылась, письмо вылезло из конверта */
         .envelope-wrapper.open .flap {
             transform: rotateX(180deg);
         }
 
         .envelope-wrapper.open .letter {
-            transform: translateY(-105%);
+            /* Письмо поднимается вверх и выходит из конверта */
+            transform: translateY(-110%) scale(1);
+        }
+
+        /* Состояние 2: Письмо полностью вышло и парит в воздухе */
+        .envelope-wrapper.letter-out .letter {
+            /* Поднимаем выше и центрируем на экране */
+            transform: translateY(-50vh) translateX(-50%) scale(1.1);
+            top: 50%;
+            left: 50%;
+            bottom: auto;
+            width: 80vw;
+            max-width: 500px;
+            height: 70vh;
+            max-height: 500px;
+            z-index: 20;
+            transition: transform 1.5s ease-in-out, top 1.5s ease-in-out, left 1.5s ease-in-out, width 1.5s ease-in-out, height 1.5s ease-in-out;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.9);
         }
 
         /* Текст внутри черного листка */
@@ -238,7 +258,7 @@
         .main-site {
             opacity: 0;
             transform: translateY(40px);
-            transition: opacity 2s ease 1.5s, transform 2s ease 1.5s;
+            transition: opacity 2s ease 2s, transform 2s ease 2s;
             padding: 50px 20px 80px;
             pointer-events: none;
             position: relative;
@@ -448,8 +468,11 @@
                 bottom: 8%;
                 padding: 15px;
             }
-            .envelope-wrapper.open .letter {
-                transform: translateY(-108%);
+            .envelope-wrapper.letter-out .letter {
+                width: 90vw;
+                height: 70vh;
+                max-height: 450px;
+                transform: translateY(-50vh) translateX(-50%) scale(1);
             }
             .school-section {
                 grid-template-columns: 1fr;
@@ -573,42 +596,45 @@
         const music = document.getElementById('music');
         const musicBtn = document.getElementById('musicBtn');
 
+        let isOpened = false;
+
         // Открытие конверта
         openBtn.addEventListener('click', function(e) {
             e.preventDefault();
 
-            // Защита от повторного открытия
-            if (envelope.classList.contains('open')) return;
+            if (isOpened) return;
+            isOpened = true;
 
+            // 1. Открываем крышку и выдвигаем письмо
             envelope.classList.add('open');
 
-            // Запуск музыки (только после действия пользователя)
+            // Запуск музыки
             const playPromise = music.play();
             if (playPromise !== undefined) {
-                playPromise.catch(() => {
-                    console.log('Музыка будет доступна после взаимодействия');
-                });
+                playPromise.catch(() => {});
             }
 
-            // Через 3.5 секунды (когда письмо выдвинулось) запускаем исчезновение конверта
+            // 2. Через 2 секунды письмо полностью выходит в центр
+            setTimeout(() => {
+                envelope.classList.add('letter-out');
+            }, 2200);
+
+            // 3. Через 4.5 секунды конверт исчезает, появляется основной сайт
             setTimeout(() => {
                 startScreen.classList.add('fade-out');
-
-                // Показываем основной сайт
                 mainSite.classList.add('show');
 
-                // Плавный скролл вверх (чтобы сразу видеть сайт)
                 window.scrollTo({
                     top: 0,
                     behavior: 'smooth'
                 });
 
-                // Полностью скрываем экран из потока после анимации
+                // Полностью скрываем экран
                 setTimeout(() => {
                     startScreen.style.display = 'none';
                 }, 2000);
 
-            }, 4000);
+            }, 5500);
         });
 
         // Управление музыкой
@@ -622,7 +648,7 @@
             }
         });
 
-        // Таймер обратного отсчета
+        // Таймер
         const targetDate = new Date("May 22, 2026 00:00:00").getTime();
 
         function updateTimer() {
@@ -650,11 +676,6 @@
 
         updateTimer();
         setInterval(updateTimer, 1000);
-
-        // Предзагрузка изображений для плавности (опционально)
-        window.addEventListener('load', () => {
-            document.body.classList.add('loaded');
-        });
     })();
 </script>
 
