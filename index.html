@@ -19,7 +19,6 @@
             font-family: 'Montserrat', sans-serif;
             color: white;
             overflow-x: hidden;
-            background: #06070b;
         }
 
         /* Фон */
@@ -68,13 +67,14 @@
             justify-content: center;
             align-items: center;
             flex-direction: column;
-            transition: opacity 1s ease, visibility 1s ease;
+            transition: opacity 1.5s ease, transform 1.5s ease;
             z-index: 10;
         }
 
+        /* Анимация исчезновения: уходит вниз и пропадает */
         .start-screen.fade-out {
             opacity: 0;
-            visibility: hidden;
+            transform: translateY(100vh);
             pointer-events: none;
         }
 
@@ -162,21 +162,21 @@
             box-shadow: 0 0 35px rgba(214, 179, 106, 0.6);
         }
 
-        /* ПИСЬМО */
+        /* ПИСЬМО - ЧЕРНЫЙ ЛИСТОК */
         .letter {
             position: absolute;
             width: 86%;
             height: 80%;
-            background: linear-gradient(145deg, #11151c, #1a1f2b);
+            background: #0d0f12; /* Почти черный фон */
             left: 7%;
             bottom: 10%;
             transform: translateY(120%);
-            border-radius: 16px;
-            border: 1px solid rgba(214, 179, 106, 0.5);
+            border-radius: 12px;
+            border: 1px solid rgba(214, 179, 106, 0.4);
             transition: transform 2.5s cubic-bezier(0.4, 0.0, 0.2, 1);
             z-index: 2;
             padding: 20px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -190,29 +190,31 @@
             transform: translateY(-105%);
         }
 
-        /* Текст внутри письма */
+        /* Текст внутри черного листка */
         .letter-content {
             text-align: center;
             opacity: 0;
-            transform: translateY(30px);
-            transition: opacity 2s ease 0.5s, transform 2s ease 0.5s;
+            transform: scale(0.9);
+            transition: opacity 1.5s ease 0.8s, transform 1.5s ease 0.8s;
             width: 100%;
         }
 
         .envelope-wrapper.open .letter-content {
             opacity: 1;
-            transform: translateY(0);
+            transform: scale(1);
         }
 
+        /* Стили текста на черном фоне */
         .main-title {
-            font-size: clamp(40px, 12vw, 80px);
+            font-size: clamp(50px, 12vw, 90px);
             font-family: 'Cormorant Garamond', serif;
-            color: #f1d089;
+            color: #f1d089; /* Золотой */
             line-height: 1;
+            text-shadow: 0 0 10px rgba(241, 208, 137, 0.3);
         }
 
         .sub-title {
-            font-size: clamp(24px, 7vw, 48px);
+            font-size: clamp(28px, 7vw, 50px);
             color: #f1d089;
             font-family: 'Cormorant Garamond', serif;
             margin-top: 5px;
@@ -227,7 +229,7 @@
 
         .desc {
             margin-top: 15px;
-            color: #ddd;
+            color: #ccc;
             font-size: clamp(14px, 3.5vw, 18px);
             padding: 0 10px;
         }
@@ -236,7 +238,7 @@
         .main-site {
             opacity: 0;
             transform: translateY(40px);
-            transition: opacity 2s ease, transform 2s ease;
+            transition: opacity 2s ease 1.5s, transform 2s ease 1.5s;
             padding: 50px 20px 80px;
             pointer-events: none;
             position: relative;
@@ -584,28 +586,29 @@
             const playPromise = music.play();
             if (playPromise !== undefined) {
                 playPromise.catch(() => {
-                    // Автовоспроизведение заблокировано, будем ждать следующего клика
                     console.log('Музыка будет доступна после взаимодействия');
                 });
             }
 
-            // Через 5 секунд скрываем стартовый экран и показываем основной контент
+            // Через 3.5 секунды (когда письмо выдвинулось) запускаем исчезновение конверта
             setTimeout(() => {
                 startScreen.classList.add('fade-out');
+
+                // Показываем основной сайт
                 mainSite.classList.add('show');
 
-                // Плавный скролл к основному контенту (на случай, если остался видим)
+                // Плавный скролл вверх (чтобы сразу видеть сайт)
                 window.scrollTo({
                     top: 0,
                     behavior: 'smooth'
                 });
 
-                // Через переход полностью убираем стартовый экран из потока
+                // Полностью скрываем экран из потока после анимации
                 setTimeout(() => {
                     startScreen.style.display = 'none';
-                }, 1000);
+                }, 2000);
 
-            }, 5000);
+            }, 4000);
         });
 
         // Управление музыкой
