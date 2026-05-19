@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // 2. Countdown Timer Logic
-    const targetDate = new Date('June 15, 2026 19:00:00').getTime();
+    const targetDate = new Date('May 22, 2026 9:00:00').getTime();
 
     const daysEl = document.getElementById('days');
     const hoursEl = document.getElementById('hours');
