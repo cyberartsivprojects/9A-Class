@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>9Ա Վերջին Զանգ</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Montserrat:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #06070b;
+            font-family: 'Montserrat', sans-serif;
+            color: white;
+            overflow-x: hidden;
+            background: #06070b;
+        }
+
+        /* Фон */
+        .bg {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.88)),
+            url('https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=1600&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            z-index: -3;
+        }
+
+        /* Парящие частицы */
+        .particles span {
+            position: fixed;
+            width: 6px;
+            height: 6px;
+            background: #d6b36a;
+            border-radius: 50%;
+            animation: float 10s linear infinite;
+            opacity: 0.7;
+            z-index: -1;
+        }
+        .particles span:nth-child(1) { left: 10%; animation-duration: 8s; }
+        .particles span:nth-child(2) { left: 20%; animation-duration: 12s; }
+        .particles span:nth-child(3) { left: 35%; animation-duration: 9s; }
+        .particles span:nth-child(4) { left: 50%; animation-duration: 15s; }
+        .particles span:nth-child(5) { left: 70%; animation-duration: 10s; }
+        .particles span:nth-child(6) { left: 85%; animation-duration: 13s; }
+        .particles span:nth-child(7) { left: 93%; animation-duration: 7s; }
+
+        @keyframes float {
+            0% { transform: translateY(100vh) scale(0); opacity: 0; }
+            10% { opacity: 0.7; }
+            90% { opacity: 0.7; }
+            100% { transform: translateY(-10vh) scale(1.5); opacity: 0; }
+        }
+
+        /* СТАРТОВЫЙ ЭКРАН С КОНВЕРТОМ */
+        .start-screen {
+            position: relative;
+            height: 100vh;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            transition: opacity 1s ease, visibility 1s ease;
+            z-index: 10;
+        }
+
+        .start-screen.fade-out {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        /* КОНВЕРТ */
+        .envelope-wrapper {
+            position: relative;
+            width: 90vw;
+            max-width: 600px;
+            height: 55vw;
+            max-height: 360px;
+            perspective: 1000px;
+        }
+
+        .envelope {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: #efe5d5;
+            border-radius: 4px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .flap {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: #f6f2ea;
+            clip-path: polygon(0 0, 50% 50%, 100% 0);
+            transform-origin: top;
+            transition: transform 1.8s cubic-bezier(0.4, 0.0, 0.2, 1);
+            z-index: 5;
+        }
+
+        .left {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: #ece2d1;
+            clip-path: polygon(0 0, 0 100%, 50% 50%);
+        }
+
+        .right {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: #e5dac8;
+            clip-path: polygon(100% 0, 100% 100%, 50% 50%);
+        }
+
+        .bottom {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: #f1e8da;
+            clip-path: polygon(0 100%, 50% 50%, 100% 100%);
+        }
+
+        /* Печать */
+        .seal {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #111;
+            border: 4px solid #2a2a2a;
+            color: #d8b56a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            font-family: 'Cormorant Garamond', serif;
+            z-index: 10;
+            cursor: pointer;
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s, box-shadow 0.3s;
+            user-select: none;
+        }
+
+        .seal:active {
+            transform: translate(-50%, -50%) scale(0.95);
+            box-shadow: 0 0 35px rgba(214, 179, 106, 0.6);
+        }
+
+        /* ПИСЬМО */
+        .letter {
+            position: absolute;
+            width: 86%;
+            height: 80%;
+            background: linear-gradient(145deg, #11151c, #1a1f2b);
+            left: 7%;
+            bottom: 10%;
+            transform: translateY(120%);
+            border-radius: 16px;
+            border: 1px solid rgba(214, 179, 106, 0.5);
+            transition: transform 2.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+            z-index: 2;
+            padding: 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .envelope-wrapper.open .flap {
+            transform: rotateX(180deg);
+        }
+
+        .envelope-wrapper.open .letter {
+            transform: translateY(-105%);
+        }
+
+        /* Текст внутри письма */
+        .letter-content {
+            text-align: center;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 2s ease 0.5s, transform 2s ease 0.5s;
+            width: 100%;
+        }
+
+        .envelope-wrapper.open .letter-content {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .main-title {
+            font-size: clamp(40px, 12vw, 80px);
+            font-family: 'Cormorant Garamond', serif;
+            color: #f1d089;
+            line-height: 1;
+        }
+
+        .sub-title {
+            font-size: clamp(24px, 7vw, 48px);
+            color: #f1d089;
+            font-family: 'Cormorant Garamond', serif;
+            margin-top: 5px;
+        }
+
+        .date {
+            margin-top: 15px;
+            font-size: clamp(18px, 5vw, 32px);
+            color: #d7b26b;
+            font-family: 'Cormorant Garamond', serif;
+        }
+
+        .desc {
+            margin-top: 15px;
+            color: #ddd;
+            font-size: clamp(14px, 3.5vw, 18px);
+            padding: 0 10px;
+        }
+
+        /* ОСНОВНОЙ САЙТ */
+        .main-site {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 2s ease, transform 2s ease;
+            padding: 50px 20px 80px;
+            pointer-events: none;
+            position: relative;
+            z-index: 5;
+        }
+
+        .main-site.show {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        /* HERO */
+        .hero {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .hero h1 {
+            font-size: clamp(60px, 20vw, 120px);
+            font-family: 'Cormorant Garamond', serif;
+            color: #f1d089;
+            line-height: 0.9;
+        }
+
+        .hero h2 {
+            font-size: clamp(30px, 10vw, 65px);
+            font-family: 'Cormorant Garamond', serif;
+            color: #f1d089;
+        }
+
+        .hero p {
+            color: #d9b976;
+            font-size: clamp(20px, 6vw, 35px);
+            margin-top: 10px;
+        }
+
+        /* ТАЙМЕР */
+        .timer {
+            margin-top: 40px;
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .box {
+            width: clamp(70px, 20vw, 140px);
+            height: clamp(70px, 20vw, 140px);
+            border: 1px solid rgba(214, 179, 106, 0.5);
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .box h3 {
+            font-size: clamp(28px, 8vw, 50px);
+            color: #f1d089;
+        }
+
+        .box span {
+            color: #d8b56a;
+            margin-top: 5px;
+            font-size: clamp(12px, 3vw, 16px);
+        }
+
+        /* ШКОЛА */
+        .school-section {
+            margin-top: 80px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(214, 179, 106, 0.25);
+            border-radius: 28px;
+            overflow: hidden;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        .school-text {
+            padding: 30px;
+        }
+
+        .school-text h2 {
+            font-size: clamp(32px, 8vw, 55px);
+            color: #f1d089;
+            margin-bottom: 15px;
+            font-family: 'Cormorant Garamond', serif;
+        }
+
+        .school-text p {
+            color: #ddd;
+            line-height: 1.8;
+            font-size: clamp(14px, 3.5vw, 18px);
+        }
+
+        .school-image img {
+            width: 100%;
+            height: 100%;
+            min-height: 250px;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* УЧЕНИКИ */
+        .students-title {
+            margin-top: 80px;
+            text-align: center;
+            font-size: clamp(36px, 10vw, 60px);
+            color: #f1d089;
+            font-family: 'Cormorant Garamond', serif;
+        }
+
+        .students {
+            margin-top: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .student {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(214, 179, 106, 0.3);
+            border-radius: 18px;
+            overflow: hidden;
+            transition: transform 0.4s, box-shadow 0.4s;
+        }
+
+        .student:active {
+            transform: translateY(-5px);
+            box-shadow: 0 0 20px rgba(214, 179, 106, 0.2);
+        }
+
+        .student img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            pointer-events: none;
+        }
+
+        .student h3 {
+            text-align: center;
+            padding-top: 8px;
+            color: #f0d08a;
+            font-size: 18px;
+        }
+
+        .student p {
+            text-align: center;
+            padding-bottom: 12px;
+            color: #ddd;
+            font-size: 14px;
+        }
+
+        /* КНОПКА МУЗЫКИ */
+        .music-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 1px solid rgba(214, 179, 106, 0.5);
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            color: #d6b36a;
+            font-size: 22px;
+            cursor: pointer;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+        }
+
+        .music-btn:active {
+            background: rgba(214, 179, 106, 0.2);
+        }
+
+        audio {
+            display: none;
+        }
+
+        /* АДАПТИВ */
+        @media (max-width: 768px) {
+            .envelope-wrapper {
+                width: 90vw;
+                height: 58vw;
+                max-height: 280px;
+            }
+            .seal {
+                width: 65px;
+                height: 65px;
+                font-size: 28px;
+            }
+            .letter {
+                width: 88%;
+                left: 6%;
+                bottom: 8%;
+                padding: 15px;
+            }
+            .envelope-wrapper.open .letter {
+                transform: translateY(-108%);
+            }
+            .school-section {
+                grid-template-columns: 1fr;
+            }
+            .school-image img {
+                height: 250px;
+            }
+            .students {
+                grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            }
+            .student img {
+                height: 160px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .students {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg"></div>
+
+<div class="particles">
+    <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+</div>
+
+<audio id="music" loop preload="auto">
+    <source src="https://files.catbox.moe/u3pfku.mp3" type="audio/mpeg">
+</audio>
+
+<button class="music-btn" id="musicBtn" aria-label="Музыка">♫</button>
+
+<!-- СТАРТОВЫЙ ЭКРАН -->
+<section class="start-screen" id="startScreen">
+    <div class="envelope-wrapper" id="envelope">
+        <div class="envelope">
+            <div class="flap"></div>
+            <div class="left"></div>
+            <div class="right"></div>
+            <div class="bottom"></div>
+
+            <div class="letter">
+                <div class="letter-content">
+                    <div class="main-title">9Ա</div>
+                    <div class="sub-title">Վերջին զանգ</div>
+                    <div class="date">22 Մայիս 2026</div>
+                    <div class="desc">Մենք ձեզ հրավիրում ենք մեր վերջին զանգին</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="seal" id="openBtn">9Ա</div>
+    </div>
+</section>
+
+<!-- ОСНОВНОЙ КОНТЕНТ -->
+<section class="main-site" id="mainSite">
+    <div class="hero">
+        <h1>9Ա</h1>
+        <h2>Վերջին զանգ</h2>
+        <p>22 Մայիս 2026</p>
+    </div>
+
+    <div class="timer">
+        <div class="box"><h3 id="days">0</h3><span>Օր</span></div>
+        <div class="box"><h3 id="hours">0</h3><span>Ժամ</span></div>
+        <div class="box"><h3 id="minutes">0</h3><span>Րոպե</span></div>
+        <div class="box"><h3 id="seconds">0</h3><span>Վայրկյան</span></div>
+    </div>
+
+    <div class="school-section">
+        <div class="school-text">
+            <h2>Մեր դպրոցը</h2>
+            <p>
+                Դպրոցը այն վայրն է, որտեղ մենք սովորեցինք երազել,
+                հավատալ մեր ուժերին և ստեղծել հիշողություններ, որոնք
+                կմնան մեզ հետ ամբողջ կյանքի ընթացքում։
+                Այստեղ անցան մեր կյանքի ամենագեղեցիկ տարիները։
+            </p>
+        </div>
+        <div class="school-image">
+            <img src="https://images.unsplash.com/photo-1580582932707-520aed937b7b?q=80&w=1200&auto=format&fit=crop" alt="Школа">
+        </div>
+    </div>
+
+    <div class="students-title">Մեր դասարանը</div>
+    <div class="students">
+        <div class="student"><img src="https://picsum.photos/300/400?1" loading="lazy"><h3>Արամ</h3><p>Աշակերտ</p></div>
+        <div class="student"><img src="https://picsum.photos/300/400?2" loading="lazy"><h3>Աննա</h3><p>Աշակերտուհի</p></div>
+        <div class="student"><img src="https://picsum.photos/300/400?3" loading="lazy"><h3>Դավիթ</h3><p>Աշակերտ</p></div>
+        <div class="student"><img src="https://picsum.photos/300/400?4" loading="lazy"><h3>Մարի</h3><p>Աշակերտուհի</p></div>
+        <div class="student"><img src="https://picsum.photos/300/400?5" loading="lazy"><h3>Գոռ</h3><p>Աշակերտ</p></div>
+        <div class="student"><img src="https://picsum.photos/300/400?6" loading="lazy"><h3>Լիլիթ</h3><p>Աշակերտուհի</p></div>
+        <div class="student"><img src="https://picsum.photos/300/400?7" loading="lazy"><h3>Հայկ</h3><p>Աշակերտ</p></div>
+        <div class="student"><img src="https://picsum.photos/300/400?8" loading="lazy"><h3>Նարե</h3><p>Աշակերտուհի</p></div>
+        <div class="student"><img src="https://picsum.photos/300/400?9" loading="lazy"><h3>Սամվել</h3><p>Աշակերտ</p></div>
+        <div class="student"><img src="https://picsum.photos/300/400?10" loading="lazy"><h3>Լիա</h3><p>Աշակերտուհի</p></div>
+        <div class="student"><img src="https://picsum.photos/300/400?11" loading="lazy"><h3>Էրիկ</h3><p>Աշակերտ</p></div>
+        <div class="student"><img src="https://picsum.photos/300/400?12" loading="lazy"><h3>Անի</h3><p>Աշակերտուհի</p></div>
+        <div class="student"><img src="https://picsum.photos/300/400?13" loading="lazy"><h3>Տիգրան</h3><p>Աշակերտ</p></div>
+        <div class="student"><img src="https://picsum.photos/300/400?14" loading="lazy"><h3>Սոնա</h3><p>Աշակերտուհի</p></div>
+        <div class="student"><img src="https://picsum.photos/300/400?15" loading="lazy"><h3>Կարեն</h3><p>Աշակերտ</p></div>
+        <div class="student"><img src="https://picsum.photos/300/400?16" loading="lazy"><h3>Միլենա</h3><p>Աշակերտուհի</p></div>
+        <div class="student"><img src="https://picsum.photos/300/400?17" loading="lazy"><h3>Արթուր</h3><p>Աշակերտ</p></div>
+        <div class="student"><img src="https://picsum.photos/300/400?18" loading="lazy"><h3>Լուսինե</h3><p>Աշակերտուհի</p></div>
+        <div class="student"><img src="https://picsum.photos/300/400?19" loading="lazy"><h3>Վահե</h3><p>Աշակերտ</p></div>
+        <div class="student"><img src="https://picsum.photos/300/400?20" loading="lazy"><h3>Էլինա</h3><p>Աշակերտուհի</p></div>
+    </div>
+</section>
+
+<script>
+    (function() {
+        const envelope = document.getElementById('envelope');
+        const openBtn = document.getElementById('openBtn');
+        const mainSite = document.getElementById('mainSite');
+        const startScreen = document.getElementById('startScreen');
+        const music = document.getElementById('music');
+        const musicBtn = document.getElementById('musicBtn');
+
+        // Открытие конверта
+        openBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            // Защита от повторного открытия
+            if (envelope.classList.contains('open')) return;
+
+            envelope.classList.add('open');
+
+            // Запуск музыки (только после действия пользователя)
+            const playPromise = music.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(() => {
+                    // Автовоспроизведение заблокировано, будем ждать следующего клика
+                    console.log('Музыка будет доступна после взаимодействия');
+                });
+            }
+
+            // Через 5 секунд скрываем стартовый экран и показываем основной контент
+            setTimeout(() => {
+                startScreen.classList.add('fade-out');
+                mainSite.classList.add('show');
+
+                // Плавный скролл к основному контенту (на случай, если остался видим)
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+
+                // Через переход полностью убираем стартовый экран из потока
+                setTimeout(() => {
+                    startScreen.style.display = 'none';
+                }, 1000);
+
+            }, 5000);
+        });
+
+        // Управление музыкой
+        musicBtn.addEventListener('click', function() {
+            if (music.paused) {
+                music.play().catch(() => {});
+                musicBtn.textContent = '♫';
+            } else {
+                music.pause();
+                musicBtn.textContent = '♪';
+            }
+        });
+
+        // Таймер обратного отсчета
+        const targetDate = new Date("May 22, 2026 00:00:00").getTime();
+
+        function updateTimer() {
+            const now = new Date().getTime();
+            const distance = targetDate - now;
+
+            if (distance < 0) {
+                document.getElementById('days').textContent = '0';
+                document.getElementById('hours').textContent = '0';
+                document.getElementById('minutes').textContent = '0';
+                document.getElementById('seconds').textContent = '0';
+                return;
+            }
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            document.getElementById('days').textContent = days;
+            document.getElementById('hours').textContent = hours;
+            document.getElementById('minutes').textContent = minutes;
+            document.getElementById('seconds').textContent = seconds;
+        }
+
+        updateTimer();
+        setInterval(updateTimer, 1000);
+
+        // Предзагрузка изображений для плавности (опционально)
+        window.addEventListener('load', () => {
+            document.body.classList.add('loaded');
+        });
+    })();
+</script>
+
+</body>
+</html>
